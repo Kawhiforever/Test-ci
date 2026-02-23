@@ -1,6 +1,8 @@
 - name: Deploy Flask to Rocky Linux 9.7
   hosts: rocky_servers
   become: yes
+  become_method:sudo
+  become_pass:"root"
   tasks:
     - name: Ensure Python3 installed (Rocky may not have it by default)
       dnf:
