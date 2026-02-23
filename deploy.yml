@@ -1,0 +1,49 @@
+- name: Deploy Flask to Rocky Linux 9.7
+  hosts: rocky_servers
+  become: yes
+  tasks:
+    - name: Ensure Python3 installed (Rocky may not have it by default)
+      dnf:
+        name: python3
+        state: present
+
+    - name: Install Flask
+      pip:
+        name: flask
+        executable: pip3
+
+    - name: Create app directory
+      file:
+        path: /opt/flask_app
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Copy application
+      copy:
+        src: app.py
+        dest: /opt/flask_app/app.py
+        owner: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Create systemd service
+      copy:
+        content: |
+          [Unit]
+          Description=Flask CI/CD Demo
+          After=network.target
+          [Service]
+          User={{ ansible_user }}
+          WorkingDirectory=/opt/flask_app
+          ExecStart=/usr/bin/python3 /opt/flask_app/app.py
+          Restart=always
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/flask-app.service
+
+    - name: Start and enable service
+      systemd:
+        name: flask-app.service
+        state: started
+        enabled: yes
+        daemon_reload: yes

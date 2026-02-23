@@ -1,0 +1,13 @@
+name: Rocky Linux 9.7 Deployment
+on: [push]
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🔍 Verify Rocky connectivity
+        run: ansible rocky-vm -i inventory.ini -m ping
+      - name: 🚀 Deploy application
+        run: ansible-playbook -i inventory.ini deploy.yml
+      - name: ✅ Validate deployment
+        run: curl -f http://192.168.2.195:5000/hello || (echo "FAILED!" && exit 1)
