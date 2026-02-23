@@ -2,7 +2,7 @@ name: Rocky Linux 9.7 Deployment
 on: [push]
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: 🔍 Verify Rocky connectivity
